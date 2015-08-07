@@ -43,7 +43,7 @@ void vm_main(void)
 
 VMINT32 gpio_input_demo_read_thread(VM_THREAD_HANDLE thread_handle, void* user_data)
 {
-    VM_DCL_HANDLE gpio_handle_d7 = VM_DCL_HANDLE_INVALID;
+    VM_DCL_HANDLE gpio_handle_d7 = VM_DCL_HANDLE_INVALID;//IO句柄
     VM_DCL_HANDLE gpio_handle_d8 = VM_DCL_HANDLE_INVALID;
     vm_dcl_gpio_control_level_status_t data;
     VMINT i;
@@ -51,9 +51,9 @@ VMINT32 gpio_input_demo_read_thread(VM_THREAD_HANDLE thread_handle, void* user_d
     vm_log_info("[GPIO]gpio_input_demo_read_thread - START.");
 
     /* Opens GPIO PIN READ_PIN */
-    gpio_handle_d7 = vm_dcl_open(VM_DCL_GPIO, READ_PIN);
+    gpio_handle_d7 = vm_dcl_open(VM_DCL_GPIO, READ_PIN);//输入模式，成功则open函数返回VM_DCL_HANDLE，失败返回VM_DCL_HANDLE_INVALID
 
-    if (gpio_handle_d7 != VM_DCL_HANDLE_INVALID)
+    if (gpio_handle_d7 != VM_DCL_HANDLE_INVALID)//先设置为VM_DCL_HANDLE_INVALID，开启成功便成
     {
         /* Sets the pin mode to MODE_0 */
         vm_dcl_control(gpio_handle_d7, VM_DCL_GPIO_COMMAND_SET_MODE_0, NULL);
@@ -62,8 +62,8 @@ VMINT32 gpio_input_demo_read_thread(VM_THREAD_HANDLE thread_handle, void* user_d
         vm_dcl_control(gpio_handle_d7, VM_DCL_GPIO_COMMAND_SET_DIRECTION_IN, NULL);
 
         /* Sets the pin to pull-low status */
-        vm_dcl_control(gpio_handle_d7, VM_DCL_GPIO_COMMAND_ENABLE_PULL, NULL);
-        vm_dcl_control(gpio_handle_d7, VM_DCL_GPIO_COMMAND_SET_PULL_LOW, NULL);
+        vm_dcl_control(gpio_handle_d7, VM_DCL_GPIO_COMMAND_ENABLE_PULL, NULL);//设置上下拉模式
+        vm_dcl_control(gpio_handle_d7, VM_DCL_GPIO_COMMAND_SET_PULL_LOW, NULL);//下拉
     }
     else
     {
@@ -91,7 +91,7 @@ VMINT32 gpio_input_demo_read_thread(VM_THREAD_HANDLE thread_handle, void* user_d
     for (i = 0; i < 120; i++)
     {
         /* Reads the status from READ_PIN */
-        vm_dcl_control(gpio_handle_d7, VM_DCL_GPIO_COMMAND_READ, (void*)&data);
+        vm_dcl_control(gpio_handle_d7, VM_DCL_GPIO_COMMAND_READ, (void*)&data);//读出数据存到data指针
         vm_log_info("digital read READ_PIN, result = %d;", data.level_status);
 
         if (data.level_status == 1)
@@ -123,7 +123,7 @@ void gpio_input_demo_handle_sysevt(VMINT message, VMINT param)
     case VM_EVENT_CREATE:
         vm_log_info("Sample of GPIO input - Start.");
         /* Creates a sub-thread with the priority of 255 */
-        vm_thread_create(gpio_input_demo_read_thread, NULL, 255);
+        vm_thread_create(gpio_input_demo_read_thread, NULL, 255);//添加子线程监测输入
 
         break;
 
